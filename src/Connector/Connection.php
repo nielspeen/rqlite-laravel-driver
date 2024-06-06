@@ -149,11 +149,8 @@ final class Connection implements \Doctrine\DBAL\Driver\Connection
         }
     }
 
-    /**
-     * @param  ResponseInterface  $res
-     * @return mixed
-     */
-    private function getResultOrFail(ResponseInterface $res)
+//    private function getResultOrFail(ResponseInterface $res)
+    private function getResultOrFail(\Illuminate\Http\Client\Response $res)
     {
         $result = json_decode($res->getBody(), true);
         if (isset($result['results'])) {
