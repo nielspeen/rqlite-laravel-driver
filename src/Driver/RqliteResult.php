@@ -38,7 +38,7 @@ class RqliteResult implements \Doctrine\DBAL\Driver\Result
     /**
      * {@inheritDoc}
      */
-    public function fetchAssociative()
+    public function fetchAssociative(): array|false
     {
         $row = $this->fetch();
 

@@ -16,6 +16,7 @@ class RqliteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Sta
     private string $sql;
 
     private PendingRequest $connection;
+    public int $lastInsertId;
 
     /**
      * @var array
@@ -98,6 +99,8 @@ class RqliteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Sta
                 }
             });
         }
+
+        $this->lastInsertId = $result['results'][0]['last_insert_id'];
 
         return $result['results'];
     }
