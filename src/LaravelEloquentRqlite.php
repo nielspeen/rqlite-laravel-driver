@@ -1,6 +1,6 @@
 <?php
 
-namespace Hushulin\LaravelEloquentRqlite;
+namespace Wanwire\LaravelEloquentRqlite;
 
 class LaravelEloquentRqlite
 {

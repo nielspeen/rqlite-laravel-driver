@@ -1,6 +1,6 @@
 <?php
 
-namespace Hushulin\LaravelEloquentRqlite\Connector;
+namespace Wanwire\LaravelEloquentRqlite\Connector;
 
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Driver\Result;
@@ -8,19 +8,16 @@ use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Hushulin\LaravelEloquentRqlite\Driver\RqliteStatement;
+use Wanwire\LaravelEloquentRqlite\Driver\RqliteStatement;
+use Illuminate\Http\Client\PendingRequest;
 use PDOException;
 use Psr\Http\Message\ResponseInterface;
 
 final class Connection implements \Doctrine\DBAL\Driver\Connection
 {
-    /**
-     * @var Client
-     */
-    private Client $connection;
+    private PendingRequest $connection;
 
-    /** @internal The connection can be only instantiated by its driver. */
-    public function __construct(Client $connection)
+    public function __construct(PendingRequest $connection)
     {
         $this->connection = $connection;
     }

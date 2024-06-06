@@ -1,6 +1,6 @@
 <?php
 
-namespace Hushulin\LaravelEloquentRqlite\Driver;
+namespace Wanwire\LaravelEloquentRqlite\Driver;
 
 use Doctrine\DBAL\Driver\Exception;
 

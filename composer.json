@@ -1,14 +1,19 @@
 {
-    "name": "hushulin/laravel-eloquent-rqlite",
-    "description": "larevel eloquent for rqlite",
+    "name": "nielspeen/laravel-eloquent-rqlite",
+    "description": "Rqlite driver for Laravel",
     "keywords": [
         "hushulin",
+        "nielspeen",
         "laravel",
         "laravel-eloquent-rqlite"
     ],
-    "homepage": "https://github.com/hushulin/laravel-eloquent-rqlite",
+    "homepage": "https://github.com/nielspeen/laravel-eloquent-rqlite",
     "license": "MIT",
     "authors": [
+        {
+            "name": "nielspeen",
+            "role": "Developer"
+        },
         {
             "name": "hushulin",
             "email": "hushulin12321@gmail.com",
@@ -16,13 +21,10 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
-        "doctrine/dbal": "^3.1",
-        "guzzlehttp/guzzle": "^7.3",
-        "illuminate/contracts": "^7.0|^8.0|^9.0",
+        "illuminate/contracts": "^11.0",
         "spatie/laravel-package-tools": "^1.12.1",
         "ext-json": "*",
-      "ext-pdo": "*"
+        "ext-pdo": "*"
     },
     "require-dev": {
         "nunomaduro/collision": "^5.0",
@@ -38,13 +40,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Hushulin\\LaravelEloquentRqlite\\": "src",
-            "Hushulin\\LaravelEloquentRqlite\\Database\\Factories\\": "database/factories"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Hushulin\\LaravelEloquentRqlite\\Tests\\": "tests"
+            "Wanwire\\LaravelEloquentRqlite\\": "src"
         }
     },
     "scripts": {
@@ -59,10 +55,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Hushulin\\LaravelEloquentRqlite\\LaravelEloquentRqliteServiceProvider"
+                "Wanwire\\LaravelEloquentRqlite\\LaravelEloquentRqliteServiceProvider"
             ],
             "aliases": {
-                "LaravelEloquentRqlite": "Hushulin\\LaravelEloquentRqlite\\Facades\\LaravelEloquentRqlite"
+                "LaravelEloquentRqlite": "Wanwire\\LaravelEloquentRqlite\\Facades\\LaravelEloquentRqlite"
             }
         }
     },
