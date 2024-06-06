@@ -100,7 +100,9 @@ class RqliteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Sta
             });
         }
 
-        $this->lastInsertId = $result['results'][0]['last_insert_id'];
+        if(isset($result['results'][0]['last_insert_id'])) {
+            $this->lastInsertId = $result['results'][0]['last_insert_id'];
+        }
 
         return $result['results'];
     }
