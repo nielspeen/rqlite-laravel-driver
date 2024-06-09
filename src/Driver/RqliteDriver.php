@@ -16,6 +16,7 @@ class RqliteDriver extends AbstractSQLiteDriver
         return new Connection($connection);
     }
 
+
     private function createConnection(array $params): PendingRequest
     {
         if (!empty($params['username'])) {

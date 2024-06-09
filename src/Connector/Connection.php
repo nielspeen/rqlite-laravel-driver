@@ -2,17 +2,14 @@
 
 namespace Wanwire\LaravelEloquentRqlite\Connector;
 
-use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\Response;
 use Wanwire\LaravelEloquentRqlite\Driver\RqliteStatement;
 use Illuminate\Http\Client\PendingRequest;
 use PDOException;
-use Psr\Http\Message\ResponseInterface;
 
 final class Connection implements \Doctrine\DBAL\Driver\Connection
 {
@@ -32,7 +29,7 @@ final class Connection implements \Doctrine\DBAL\Driver\Connection
 
     public function query(string $sql): Result
     {
-        return $this->prepare($sql)->execute();
+       return $this->prepare($sql)->execute();
     }
 
     public function quote(mixed $value, $type = ParameterType::STRING): float|int|string
@@ -59,31 +56,16 @@ final class Connection implements \Doctrine\DBAL\Driver\Connection
     public function beginTransaction()
     {
         throw new PDOException('BEGIN invalid for rqlite.');
-        //try {
-        //    $res = $this->connection->post('/db/execute', ['json' => ['BEGIN']]);
-        //    $this->getResultOrFail($res);
-        //} catch (GuzzleException $e) {
-        //}
     }
 
     public function commit()
     {
         throw new PDOException('COMMIT invalid for rqlite.');
-        //try {
-        //    $res = $this->connection->post('/db/execute', ['json' => ['COMMIT']]);
-        //    $this->getResultOrFail($res);
-        //} catch (GuzzleException $e) {
-        //}
     }
 
     public function rollBack()
     {
         throw new PDOException('ROLLBACK invalid for rqlite.');
-        //try {
-        //    $res = $this->connection->post('/db/execute', ['json' => ['ROLLBACK']]);
-        //    $this->getResultOrFail($res);
-        //} catch (GuzzleException $e) {
-        //}
     }
 
     public function getNativeConnection(): PendingRequest
