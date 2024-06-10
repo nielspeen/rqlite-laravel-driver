@@ -1,6 +1,8 @@
 # Laravel driver for Rqlite
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+I modified huhsulin's code to make it work within my Laravel 11 projects. It is by no means complete. 
+
+If you're willing to clean this up and create a fully fledged and properly tested driver, let me know, I can arrange a bounty.
 
 ## Installation
 
@@ -40,6 +42,7 @@ lumen framework add config to config/database.php
 
 ## Credits
 
+- [nielspeen][https://github.com/nielspeen)
 - [hushulin](https://github.com/hushulin)
 - [All Contributors](../../contributors)
 
