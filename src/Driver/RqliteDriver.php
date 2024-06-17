@@ -3,6 +3,7 @@
 namespace Wanwire\LaravelEloquentRqlite\Driver;
 
 use Doctrine\DBAL\Driver\AbstractSQLiteDriver;
+use Exception;
 use Wanwire\LaravelEloquentRqlite\Connector\Connection;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
@@ -20,9 +21,20 @@ class RqliteDriver extends AbstractSQLiteDriver
     private function createConnection(array $params): PendingRequest
     {
         if (!empty($params['username'])) {
-            return Http::connectTimeout(1)->timeout(3)->retry(15)->baseUrl("http://{$params['host']}:{$params['port']}")->withBasicAuth($params['username'], $params['password']);
+            return Http::connectTimeout(1)
+                ->timeout(3)
+                ->retry(15, function (int $attempt, Exception $exception) {
+                    return $attempt * 100;
+                })->baseUrl("http://{$params['host']}:{$params['port']}")->withBasicAuth(
+                    $params['username'],
+                    $params['password']
+                );
         }
 
-        return Http::connectTimeout(1)->timeout(3)->retry(15)->baseUrl("http://{$params['host']}:{$params['port']}");
+        return Http::connectTimeout(1)
+            ->timeout(3)
+            ->retry(15, function (int $attempt, Exception $exception) {
+                return $attempt * 100;
+            })->baseUrl("http://{$params['host']}:{$params['port']}");
     }
 }
