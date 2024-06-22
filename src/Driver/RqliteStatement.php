@@ -85,7 +85,7 @@ class RqliteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Sta
     private function requestRqliteByHttp()
     {
         if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
-            $uri = '/db/query?level=none&freshness=1s';
+            $uri = '/db/query?level=strong';
         } else {
             $uri = '/db/execute';
         }
