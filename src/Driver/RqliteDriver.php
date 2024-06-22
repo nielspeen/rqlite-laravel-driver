@@ -20,21 +20,32 @@ class RqliteDriver extends AbstractSQLiteDriver
 
     private function createConnection(array $params): PendingRequest
     {
+        $connectTimeout = 3;
+        $timeout = 15;
+        $retries = 15;
+        $backoff = 250;
+
+        if(!app()->isProduction()) {
+            $connectTimeout = 1;
+            $timeout = 3;
+            $retries = 2;
+            $backoff = 100;
+        }
         if (!empty($params['username'])) {
-            return Http::connectTimeout(3)
-                ->timeout(15)
-                ->retry(15, function (int $attempt, Exception $exception) {
-                    return $attempt * 250;
+            return Http::connectTimeout($connectTimeout)
+                ->timeout($timeout)
+                ->retry($retries, function (int $attempt, Exception $exception) use($backoff) {
+                    return $attempt * $backoff;
                 })->baseUrl("http://{$params['host']}:{$params['port']}")->withBasicAuth(
                     $params['username'],
                     $params['password']
                 );
         }
 
-        return Http::connectTimeout(3)
-            ->timeout(15)
-            ->retry(15, function (int $attempt, Exception $exception) {
-                return $attempt * 250;
+        return Http::connectTimeout($connectTimeout)
+            ->timeout($timeout)
+            ->retry($retries, function (int $attempt, Exception $exception) use($backoff) {
+                return $attempt * $backoff;
             })->baseUrl("http://{$params['host']}:{$params['port']}");
     }
 }
