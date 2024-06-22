@@ -24,7 +24,7 @@ class RqliteDriver extends AbstractSQLiteDriver
             return Http::connectTimeout(1)
                 ->timeout(3)
                 ->retry(15, function (int $attempt, Exception $exception) {
-                    return $attempt * 100;
+                    return $attempt * 200;
                 })->baseUrl("http://{$params['host']}:{$params['port']}")->withBasicAuth(
                     $params['username'],
                     $params['password']
@@ -34,7 +34,7 @@ class RqliteDriver extends AbstractSQLiteDriver
         return Http::connectTimeout(1)
             ->timeout(3)
             ->retry(15, function (int $attempt, Exception $exception) {
-                return $attempt * 100;
+                return $attempt * 200;
             })->baseUrl("http://{$params['host']}:{$params['port']}");
     }
 }
