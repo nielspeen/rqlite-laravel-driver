@@ -10,24 +10,17 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelEloquentRqliteServiceProvider extends PackageServiceProvider
 {
-    public function register()
+    public function register(): void
+    {
+        Connection::resolverFor('rqlite', function ($connection, $database, $prefix, $config) {
+            return new SQLiteConnection($connection, $database, $prefix, $config);
+        });
+    }
+
+    public function boot()
     {
         $this->app->bind('db.connector.rqlite', function () {
             return new RqliteDriver();
-        });
-
-        $this->app->resolving('db', function ($db) {
-            $db->extend('rqlite', function ($config, $name) {
-
-                $connector = $this->app['db.connector.rqlite'];
-                if(isset($config['write'])) {
-                    $connection = $connector->connect($config['write']);
-                } else {
-                    $connection = $connector->connect($config);
-                }
-
-                return new SQLiteConnection($connection, ':memory:', '', $config);
-            });
         });
     }
 
