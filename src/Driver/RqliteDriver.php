@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Http;
 
 class RqliteDriver extends AbstractSQLiteDriver
 {
+    public function prepare()
+    {
+    }
+
     public function connect(array $params): Connection
     {
         $connection = $this->createConnection($params);
