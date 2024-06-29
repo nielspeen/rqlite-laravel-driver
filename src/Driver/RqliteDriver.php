@@ -37,6 +37,7 @@ class RqliteDriver extends AbstractSQLiteDriver
         }
         if (!empty($params['username'])) {
             return Http::connectTimeout($connectTimeout)
+                ->withHeader('Connection', 'keep-alive')
                 ->timeout($timeout)
                 ->retry($retries, function (int $attempt, Exception $exception) use($backoff) {
                     return $attempt * $backoff;
@@ -47,6 +48,7 @@ class RqliteDriver extends AbstractSQLiteDriver
         }
 
         return Http::connectTimeout($connectTimeout)
+            ->withHeader('Connection', 'keep-alive')
             ->timeout($timeout)
             ->retry($retries, function (int $attempt, Exception $exception) use($backoff) {
                 return $attempt * $backoff;
