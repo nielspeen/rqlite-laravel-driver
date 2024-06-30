@@ -1,6 +1,6 @@
 <?php
 
-namespace Wanwire\RQLite\Driver;
+namespace Wanwire\RQLite\PDO;
 
 use CurlHandle;
 use Doctrine\DBAL\Driver\Result as DBALResult;
@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDO;
 use PDOException;
-use PDOStatement;
+use PDOStatement as BasePDOStatement;
+use Wanwire\RQLite\Driver\Result;
 use Wanwire\RQLite\Exceptions\RQLiteDriverException;
 
-class Statement extends PDOStatement implements \Doctrine\DBAL\Driver\Statement
+class PDOStatement extends BasePDOStatement implements \Doctrine\DBAL\Driver\Statement
 {
     private string $sql;
     private CurlHandle $connection;

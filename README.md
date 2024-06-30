@@ -1,15 +1,11 @@
-# Laravel driver for RQLite
-
-I modified huhsulin's code to make it work within my Laravel 11 projects. It is by no means complete. 
-
-If you're willing to clean this up and create a fully fledged and properly tested driver, let me know, I can arrange a bounty.
+# RQLite driver for Laravel
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require nielspeen/laravel-eloquent-rqlite
+composer require nielspeen/rqlite-laravel-driver
 ```
 
 Sample configuration:
@@ -29,7 +25,7 @@ Sample configuration:
    ]
 ```
 
-Use the included RQLiteQueryBuilder trait on models where you want to specify consistency levels.
+Use the included QueryBuilder trait on models where you want to specify consistency levels.
 
 By default, all queries are executed with **strong** consistency.
 
@@ -40,7 +36,11 @@ In your Model:
 ```php
 use Wanwire\RQLite\QueryBuilder as RQLiteQueryBuilder;
 
-protected string $consistency = 'weak'; // or 'strong' or 'none'
+class MyModel extends Model   
+
+{
+    use RQLiteQueryBuilder;
+    protected string $consistency = 'weak'; // or 'strong' or 'none'
 ```
 
 Using the custom query builder:

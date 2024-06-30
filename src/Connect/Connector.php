@@ -2,42 +2,30 @@
 
 namespace Wanwire\RQLite\Connect;
 
-use CurlHandle;
-use Doctrine\DBAL\Driver\AbstractSQLiteDriver;
-use Wanwire\RQLite\Connector\DBALConnection;
+use Illuminate\Database\Connectors\SQLiteConnector;
+use JetBrains\PhpStorm\NoReturn;
+use Wanwire\RQLite\PDO\PDO;
 
-class Connector extends AbstractSQLiteDriver
+class Connector extends SQLiteConnector
 {
 
-    public function connect(array $params): DBALConnection
+    #[NoReturn] public function connect(array $config)
     {
-        $connection = $this->createConnection($params);
+        $options = $this->getOptions($config);
 
-        return new DBALConnection($connection, $params);
+        $dsn = "rqlite:host={$config['host']};port={$config['port']}";
+
+        return $this->createConnection($dsn, $config, $options);
     }
 
     /*
      * In my testing plain CURL is nearly twice as fast as Guzzle. It adds up.
      */
-    private function createConnection(array $params): CurlHandle|false
+    public function createConnection($dsn, array $config, array $options)
     {
-        $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_FORBID_REUSE, false);
-        curl_setopt($ch, CURLOPT_FRESH_CONNECT, false);
-        curl_setopt($ch, CURLOPT_TCP_NODELAY, true);
-        curl_setopt($ch, CURLOPT_TCP_FASTOPEN, true);
 
-        if (isset($params['username']) && isset($params['password'])) {
-            $username = $params['username'];
-            $password = $params['password'];
-            curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-        }
-
-        return $ch;
+        return new PDO($dsn, $config['username'], $config['password'], $options);
     }
 
 }
