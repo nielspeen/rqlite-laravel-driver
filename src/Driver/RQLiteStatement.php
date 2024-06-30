@@ -2,22 +2,22 @@
 
 namespace Wanwire\LaravelEloquentRQLite\Driver;
 
+use CurlHandle;
 use Doctrine\DBAL\Driver\Result;
 
 use Doctrine\DBAL\ParameterType;
-use Illuminate\Http\Client\PendingRequest;
+use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PDO;
 use PDOException;
 use PDOStatement;
 
-//class RQLiteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Statement
 class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Statement
 {
     private string $sql;
-    private PendingRequest $connection;
+    private CurlHandle $connection;
+    private string $baseUrl;
     public int $lastInsertId;
 
     private array $parameterizedMap = [];
@@ -25,10 +25,11 @@ class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
     private ?string $fetchClassName = null;
     private array $fetchParams = [];
 
-    public function __construct(string $sql, PendingRequest $connection)
+    public function __construct(string $sql, $connection, $baseUrl)
     {
         $this->sql = $sql;
         $this->connection = $connection;
+        $this->baseUrl = $baseUrl;
     }
 
     public function bindValue($param, $value, $type = ParameterType::STRING): bool
@@ -57,13 +58,13 @@ class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
     #[\ReturnTypeWillChange]
     public function execute($params = null): Result
     {
-        return new RQLiteResult($this->requestRqliteByHttp());
+        return new RQLiteResult($this->requestRQLiteByHttp());
     }
 
     public function fetchAll(int $mode = PDO::FETCH_DEFAULT, mixed ...$args): array
     {
         $fetchMode = ($mode === PDO::FETCH_DEFAULT) ? $this->fetchMode : $mode;
-        $results = $this->requestRqliteByHttp();
+        $results = $this->requestRQLiteByHttp();
 
         if (empty($results)) {
             return [];
@@ -110,54 +111,45 @@ class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
         return [[$sql, ...$parameterizedMap]];
     }
 
-    private function requestRqliteByHttp()
+    private function requestRQLiteByHttp()
     {
-        $retryCount = 3;
-        $retryDelayMicroseconds = 250000; // 250 milliseconds
-        $attempts = 0;
         $consistencyLevel = DB::connection('rqlite')->getConsistencyLevel();
 
-        while ($attempts < $retryCount) {
-            try {
-                if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
-                    $uri = '/db/query?level=' . $consistencyLevel . '&timings=true';
-                } else {
-                    $uri = '/db/execute';
-                }
-
-                $jsonOptionData = $this->makeRequestData($this->sql, $this->parameterizedMap);
-                $response = $this->connection->post($uri, $jsonOptionData);
-                if ($response->status() !== 200) {
-                    dd($response);
-                }
-                $result = json_decode($response->body(), true);
-
-                if (isset($result['results'])) {
-                    collect($result['results'])->map(function ($item) {
-                        if (isset($item['error'])) {
-                            throw new PDOException($item['error']);
-                        }
-                    });
-                }
-
-                if (isset($result['results'][0]['last_insert_id'])) {
-                    $this->lastInsertId = $result['results'][0]['last_insert_id'];
-                }
-
-                return $result['results'];
-            } catch (PDOException $e) {
-                if ($this->isReadOnlyDatabaseError($e)) {
-                    $attempts++;
-                    if ($attempts >= $retryCount) {
-                        Log::error('Max retry attempts reached for readonly database error', ['exception' => $e]);
-                        throw $e;
-                    }
-                    usleep($retryDelayMicroseconds); // Wait before retrying
-                } else {
-                    throw $e;
-                }
-            }
+        if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
+            $uri = '/db/query?level=' . $consistencyLevel . '&timings=true';
+        } else {
+            $uri = '/db/execute';
         }
+
+        $jsonOptionData = json_encode($this->makeRequestData($this->sql, $this->parameterizedMap));
+
+        curl_setopt($this->connection, CURLOPT_POSTFIELDS, $jsonOptionData);
+        curl_setopt($this->connection, CURLOPT_URL, $this->baseUrl . $uri);
+
+        $response = curl_exec($this->connection);
+        $httpCode = curl_getinfo($this->connection, CURLINFO_HTTP_CODE);
+
+        if ($response === false || $httpCode !== 200) {
+            $error = curl_error($this->connection);
+            curl_close($this->connection);
+            throw new Exception("cURL request failed with error: $error and HTTP code: $httpCode");
+        }
+
+        $result = json_decode($response, true);
+
+        if (isset($result['results'])) {
+            collect($result['results'])->map(function ($item) {
+                if (isset($item['error'])) {
+                    throw new PDOException($item['error']);
+                }
+            });
+        }
+
+        if (isset($result['results'][0]['last_insert_id'])) {
+            $this->lastInsertId = $result['results'][0]['last_insert_id'];
+        }
+
+        return $result['results'];
     }
 
     protected function isReadOnlyDatabaseError(PDOException $e): bool

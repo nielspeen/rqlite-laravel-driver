@@ -2,6 +2,7 @@
 
 namespace Wanwire\LaravelEloquentRQLite\Connector;
 
+use CurlHandle;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
@@ -13,17 +14,21 @@ use PDOException;
 
 final class Connection implements \Doctrine\DBAL\Driver\Connection
 {
-    private PendingRequest $connection;
+    private CurlHandle $connection;
     private RQLiteStatement $statement;
 
-    public function __construct(PendingRequest $connection)
+    private string $baseUrl;
+    private string $consistencyLevel = 'strong';
+
+    public function __construct(CurlHandle $connection, $params)
     {
         $this->connection = $connection;
+        $this->baseUrl    = "http://{$params['host']}:{$params['port']}";
     }
 
     public function prepare(string $sql): Statement
     {
-        $this->statement = new RQLiteStatement($sql, $this->connection);
+        $this->statement = new RQLiteStatement($sql, $this->connection, $this->baseUrl, $this->consistencyLevel);
         return $this->statement;
     }
 
