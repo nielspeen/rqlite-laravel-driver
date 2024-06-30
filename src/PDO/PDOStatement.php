@@ -6,7 +6,6 @@ use CurlHandle;
 use Doctrine\DBAL\Driver\Result as DBALResult;
 
 use Doctrine\DBAL\ParameterType;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDO;
 use PDOException;
@@ -19,6 +18,7 @@ class PDOStatement extends BasePDOStatement implements \Doctrine\DBAL\Driver\Sta
     private string $sql;
     private CurlHandle $connection;
     private string $baseUrl;
+    private string $consistency;
     public int $lastInsertId;
 
     private array $parameterizedMap = [];
@@ -26,11 +26,12 @@ class PDOStatement extends BasePDOStatement implements \Doctrine\DBAL\Driver\Sta
     private ?string $fetchClassName = null;
     private array $fetchParams = [];
 
-    public function __construct(string $sql, $connection, $baseUrl)
+    public function __construct(string $sql, $connection, $baseUrl, $consistency)
     {
         $this->sql = $sql;
         $this->connection = $connection;
         $this->baseUrl = $baseUrl;
+        $this->consistency = $consistency;
     }
 
     public function bindValue($param, $value, $type = ParameterType::STRING): bool
@@ -114,10 +115,8 @@ class PDOStatement extends BasePDOStatement implements \Doctrine\DBAL\Driver\Sta
 
     private function requestRQLiteByHttp()
     {
-        $consistencyLevel = DB::connection('rqlite')->getConsistencyLevel();
-
         if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
-            $uri = '/db/query?level=' . $consistencyLevel . '&timings=true';
+            $uri = '/db/query?level=' . $this->consistency . '&timings=true';
         } else {
             $uri = '/db/execute';
         }

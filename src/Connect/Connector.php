@@ -3,13 +3,11 @@
 namespace Wanwire\RQLite\Connect;
 
 use Illuminate\Database\Connectors\SQLiteConnector;
-use JetBrains\PhpStorm\NoReturn;
 use Wanwire\RQLite\PDO\PDO;
 
 class Connector extends SQLiteConnector
 {
-
-    #[NoReturn] public function connect(array $config)
+    public function connect(array $config): \PDO|PDO
     {
         $options = $this->getOptions($config);
 
@@ -18,13 +16,8 @@ class Connector extends SQLiteConnector
         return $this->createConnection($dsn, $config, $options);
     }
 
-    /*
-     * In my testing plain CURL is nearly twice as fast as Guzzle. It adds up.
-     */
-    public function createConnection($dsn, array $config, array $options)
+    public function createConnection($dsn, array $config, array $options): PDO
     {
-
-
         return new PDO($dsn, $config['username'], $config['password'], $options);
     }
 

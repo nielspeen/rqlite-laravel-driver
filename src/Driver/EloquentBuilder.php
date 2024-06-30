@@ -4,6 +4,7 @@ namespace Wanwire\RQLite\Driver;
 
 use Illuminate\Database\Eloquent\Builder;
 use Wanwire\RQLite\Connect\Connection;
+use Wanwire\RQLite\PDO\PDO;
 
 class EloquentBuilder extends Builder
 {
@@ -28,14 +29,14 @@ class EloquentBuilder extends Builder
     protected function applyConsistencyLevel(): void
     {
         if ($this->query->connection instanceof Connection) {
-            $this->query->connection->setConsistencyLevel($this->consistencyLevel);
+            $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_CONSISTENCY, $this->consistencyLevel);
         }
     }
 
     protected function resetConsistencyLevel(): void
     {
         if ($this->query->connection instanceof Connection) {
-            $this->query->connection->setConsistencyLevel('strong');
+            $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_CONSISTENCY, 'strong');
         }
     }
 

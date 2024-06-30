@@ -6,6 +6,7 @@ use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\ParameterType;
 use PDO as BasePDO;
 use PDOException;
+use ReturnTypeWillChange;
 use Wanwire\RQLite\Interfaces\PDOInterface;
 
 class PDO extends BasePDO implements PDOInterface
@@ -13,10 +14,16 @@ class PDO extends BasePDO implements PDOInterface
     private const DEFAULT_HOST = '127.0.0.1';
     private const DEFAULT_PORT = '4001';
 
+    public const RQLITE_ATTR_CONSISTENCY = 1;
+
     private const DSN_REGEX = '/^rqlite:(?:host=([^;]*))?(?:;port=([^;]*))?(?:;username=([^;]*))?(?:;password=([^;]*))?$/';
     private \CurlHandle $connection;
     private PDOStatement $lastStatement;
     private string $baseUrl;
+
+    private array $attributes = [
+        'consistency' => 'strong',
+    ];
 
     /** @noinspection PhpMissingParentConstructorInspection */
     public function __construct($dsn, $username = null, $passwd = null, $options = [])
@@ -74,6 +81,15 @@ class PDO extends BasePDO implements PDOInterface
         return $this->prepare($statement)->execute()->rowCount();
     }
 
+    public function getAttribute(int $attribute): mixed
+    {
+        switch ($attribute) {
+            case self::RQLITE_ATTR_CONSISTENCY:
+                return $this->attributes['consistency'];
+        }
+
+        return null;
+    }
 
     public function lastInsertId($name = null): string
     {
@@ -81,10 +97,10 @@ class PDO extends BasePDO implements PDOInterface
     }
 
 
-    public function prepare(string $query, array $options = [])
+    #[ReturnTypeWillChange] public function prepare(string $query, array $options = [])
     {
         // we need to store this so we can extract the lastInsertId
-        $this->lastStatement = new PDOStatement($query, $this->connection, $this->baseUrl);
+        $this->lastStatement = new PDOStatement($query, $this->connection, $this->baseUrl, $this->attributes['consistency']);
         return $this->lastStatement;
     }
 
@@ -93,20 +109,31 @@ class PDO extends BasePDO implements PDOInterface
         return $this->prepare($query)->execute();
     }
 
-    public function quote(mixed $value, $type = ParameterType::STRING): float|int|string
+    public function quote(string $string, $type = BasePDO::PARAM_STR): string|false
     {
-        if (is_int($value) || is_float($value)) {
-            return $value;
-        }
+//        if (is_int($string) || is_float($string)) {
+//            return $string;
+//        }
 
-        $value = str_replace("'", "''", $value);
+        $string = str_replace("'", "''", $string);
 
-        return "'".addcslashes($value, "\000\n\r\\\032")."'";
+        return "'".addcslashes($string, "\000\n\r\\\032")."'";
     }
 
     public function rollBack(): bool
     {
         throw new PDOException('ROLLBACK invalid for rqlite.');
+    }
+
+    public function setAttribute($attribute, $value): bool
+    {
+        switch ($attribute) {
+            case self::RQLITE_ATTR_CONSISTENCY:
+                $this->attributes['consistency'] = $value;
+                break;
+        }
+
+        return true;
     }
 
 }

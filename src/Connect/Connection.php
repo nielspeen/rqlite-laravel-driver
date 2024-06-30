@@ -3,19 +3,18 @@
 namespace Wanwire\RQLite\Connect;
 
 use Illuminate\Database\SQLiteConnection;
+use Wanwire\RQLite\PDO\PDO;
 
 class Connection extends SQLiteConnection
 {
-    protected string $consistencyLevel = 'strong';
-
     public function setConsistencyLevel($level): void
     {
-        $this->consistencyLevel = $level;
+        $this->getPdo()->setAttribute(PDO::RQLITE_ATTR_CONSISTENCY, $level);
     }
 
     public function getConsistencyLevel(): string
     {
-        return $this->consistencyLevel;
+        return $this->getPdo()->getAttribute(PDO::RQLITE_ATTR_CONSISTENCY);
     }
 
 
