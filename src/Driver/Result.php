@@ -1,10 +1,10 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Driver;
+namespace Wanwire\RQLite\Driver;
 
 use Doctrine\DBAL\Driver\Exception;
 
-class RQLiteResult implements \Doctrine\DBAL\Driver\Result
+class Result implements \Doctrine\DBAL\Driver\Result
 {
     /**
      * @var array

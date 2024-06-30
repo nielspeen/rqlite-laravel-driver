@@ -1,10 +1,11 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Driver;
+namespace Wanwire\RQLite\Driver;
 
 use Illuminate\Database\Eloquent\Builder;
+use Wanwire\RQLite\Connect\Connection;
 
-class RQLiteEloquentBuilder extends Builder
+class EloquentBuilder extends Builder
 {
     protected string $consistencyLevel = 'strong';
 
@@ -26,14 +27,14 @@ class RQLiteEloquentBuilder extends Builder
 
     protected function applyConsistencyLevel(): void
     {
-        if ($this->query->connection instanceof RQLiteConnection) {
+        if ($this->query->connection instanceof Connection) {
             $this->query->connection->setConsistencyLevel($this->consistencyLevel);
         }
     }
 
     protected function resetConsistencyLevel(): void
     {
-        if ($this->query->connection instanceof RQLiteConnection) {
+        if ($this->query->connection instanceof Connection) {
             $this->query->connection->setConsistencyLevel('strong');
         }
     }

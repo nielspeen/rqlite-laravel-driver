@@ -1,5 +1,5 @@
 {
-    "name": "nielspeen/laravel-eloquent-rqlite",
+    "name": "nielspeen/rqlite-laravel-driver",
     "description": "RQLite driver for Laravel",
     "keywords": [
         "hushulin",
@@ -7,9 +7,9 @@
         "laravel",
         "eloquent",
         "rqlite",
-        "laravel-eloquent-rqlite"
+        "rqlite-laravel-driver"
     ],
-    "homepage": "https://github.com/nielspeen/laravel-eloquent-rqlite",
+    "homepage": "https://github.com/nielspeen/rqlite-laravel-driver",
     "license": "MIT",
     "authors": [
         {
@@ -43,7 +43,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Wanwire\\LaravelEloquentRQLite\\": "src"
+            "Wanwire\\RQLite\\": "src"
         }
     },
     "scripts": {
@@ -58,7 +58,7 @@
     "extra": {
         "laravel": {
             "providers": [
-              "Wanwire\\LaravelEloquentRQLite\\LaravelEloquentRQLiteServiceProvider"
+              "Wanwire\\RQLite\\RQLiteProvider"
             ]
         }
     },

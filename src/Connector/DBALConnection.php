@@ -1,24 +1,23 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Connector;
+namespace Wanwire\RQLite\Connector;
 
 use CurlHandle;
 use Doctrine\DBAL\Driver\Result;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Driver\Statement as DBALStatement;
 use Doctrine\DBAL\ParameterType;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\Response;
-use Wanwire\LaravelEloquentRQLite\Driver\RQLiteStatement;
 use Illuminate\Http\Client\PendingRequest;
 use PDOException;
+use Wanwire\RQLite\Driver\Statement;
 
-final class Connection implements \Doctrine\DBAL\Driver\Connection
+final class DBALConnection implements \Doctrine\DBAL\Driver\Connection
 {
     private CurlHandle $connection;
-    private RQLiteStatement $statement;
+    private Statement $statement;
 
     private string $baseUrl;
-    private string $consistencyLevel = 'strong';
 
     public function __construct(CurlHandle $connection, $params)
     {
@@ -26,9 +25,9 @@ final class Connection implements \Doctrine\DBAL\Driver\Connection
         $this->baseUrl    = "http://{$params['host']}:{$params['port']}";
     }
 
-    public function prepare(string $sql): Statement
+    public function prepare(string $sql): DBALStatement
     {
-        $this->statement = new RQLiteStatement($sql, $this->connection, $this->baseUrl, $this->consistencyLevel);
+        $this->statement = new Statement($sql, $this->connection, $this->baseUrl);
         return $this->statement;
     }
 

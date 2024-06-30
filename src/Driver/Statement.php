@@ -1,19 +1,19 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Driver;
+namespace Wanwire\RQLite\Driver;
 
 use CurlHandle;
-use Doctrine\DBAL\Driver\Result;
+use Doctrine\DBAL\Driver\Result as DBALResult;
 
 use Doctrine\DBAL\ParameterType;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Wanwire\RQLite\Exceptions\RQLiteDriverException;
 
-class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Statement
+class Statement extends PDOStatement implements \Doctrine\DBAL\Driver\Statement
 {
     private string $sql;
     private CurlHandle $connection;
@@ -56,9 +56,9 @@ class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
     }
 
     #[\ReturnTypeWillChange]
-    public function execute($params = null): Result
+    public function execute($params = null): DBALResult
     {
-        return new RQLiteResult($this->requestRQLiteByHttp());
+        return new Result($this->requestRQLiteByHttp());
     }
 
     public function fetchAll(int $mode = PDO::FETCH_DEFAULT, mixed ...$args): array
@@ -132,7 +132,7 @@ class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
         if ($response === false || $httpCode !== 200) {
             $error = curl_error($this->connection);
             curl_close($this->connection);
-            throw new Exception("cURL request failed with error: $error and HTTP code: $httpCode");
+            throw new RQLiteDriverException("cURL request failed with error: $error and HTTP code: $httpCode");
         }
 
         $result = json_decode($response, true);

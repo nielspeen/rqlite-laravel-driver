@@ -1,10 +1,10 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Driver;
+namespace Wanwire\RQLite\Connect;
 
 use Illuminate\Database\SQLiteConnection;
 
-class RQLiteConnection extends SQLiteConnection
+class Connection extends SQLiteConnection
 {
     protected string $consistencyLevel = 'strong';
 
@@ -17,5 +17,6 @@ class RQLiteConnection extends SQLiteConnection
     {
         return $this->consistencyLevel;
     }
+
 
 }

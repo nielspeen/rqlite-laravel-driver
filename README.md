@@ -38,7 +38,7 @@ You can specify the consistency level by using the following methods.
 In your Model:
 
 ```php
-use Wanwire\LaravelEloquentRQLite\RQLiteQueryBuilder;
+use Wanwire\RQLite\QueryBuilder as RQLiteQueryBuilder;
 
 protected string $consistency = 'weak'; // or 'strong' or 'none'
 ```

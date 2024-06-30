@@ -1,15 +1,15 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Traits;
+namespace Wanwire\RQLite\Traits;
 
-use Wanwire\LaravelEloquentRQLite\Driver\RQLiteEloquentBuilder;
+use Wanwire\RQLite\Driver\EloquentBuilder;
 
-trait RQLiteQueryBuilder
+trait QueryBuilder
 {
 
-    public function newEloquentBuilder($query): RQLiteEloquentBuilder
+    public function newEloquentBuilder($query): EloquentBuilder
     {
-        $builder = new RQLiteEloquentBuilder($query);
+        $builder = new EloquentBuilder($query);
 
         if(isset($this->consistencyLevel)) {
             $builder->addConsistencyLevel($this->consistencyLevel);

@@ -1,19 +1,19 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRQLite\Driver;
+namespace Wanwire\RQLite\Connect;
 
 use CurlHandle;
 use Doctrine\DBAL\Driver\AbstractSQLiteDriver;
-use Wanwire\LaravelEloquentRQLite\Connector\Connection;
+use Wanwire\RQLite\Connector\DBALConnection;
 
-class RQLiteDriver extends AbstractSQLiteDriver
+class Connector extends AbstractSQLiteDriver
 {
 
-    public function connect(array $params): Connection
+    public function connect(array $params): DBALConnection
     {
         $connection = $this->createConnection($params);
 
-        return new Connection($connection, $params);
+        return new DBALConnection($connection, $params);
     }
 
     /*
