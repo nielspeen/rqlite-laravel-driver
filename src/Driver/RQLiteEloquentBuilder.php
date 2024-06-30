@@ -1,6 +1,6 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRqlite\Driver;
+namespace Wanwire\LaravelEloquentRQLite\Driver;
 
 use Illuminate\Database\Eloquent\Builder;
 

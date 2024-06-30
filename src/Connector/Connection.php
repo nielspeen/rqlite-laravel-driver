@@ -1,13 +1,13 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRqlite\Connector;
+namespace Wanwire\LaravelEloquentRQLite\Connector;
 
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\Response;
-use Wanwire\LaravelEloquentRqlite\Driver\RQLiteStatement;
+use Wanwire\LaravelEloquentRQLite\Driver\RQLiteStatement;
 use Illuminate\Http\Client\PendingRequest;
 use PDOException;
 

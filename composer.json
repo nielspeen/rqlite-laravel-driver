@@ -1,6 +1,6 @@
 {
     "name": "nielspeen/laravel-eloquent-rqlite",
-    "description": "Rqlite driver for Laravel",
+    "description": "RQLite driver for Laravel",
     "keywords": [
         "hushulin",
         "nielspeen",
@@ -40,7 +40,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Wanwire\\LaravelEloquentRqlite\\": "src"
+            "Wanwire\\LaravelEloquentRQLite\\": "src"
         }
     },
     "scripts": {
@@ -58,7 +58,7 @@
               "LaravelEloquentRQLiteServiceProvider"
             ],
             "aliases": {
-                "LaravelEloquentRqlite": "Wanwire\\LaravelEloquentRqlite\\Facades\\LaravelEloquentRqlite"
+                "LaravelEloquentRqlite": "Wanwire\\LaravelEloquentRQLite\\Facades\\LaravelEloquentRQLite"
             }
         }
     },

@@ -1,8 +1,8 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRqlite\Traits;
+namespace Wanwire\LaravelEloquentRQLite\Traits;
 
-use Wanwire\LaravelEloquentRqlite\Driver\RQLiteEloquentBuilder;
+use Wanwire\LaravelEloquentRQLite\Driver\RQLiteEloquentBuilder;
 
 trait RQLiteQueryBuilder
 {

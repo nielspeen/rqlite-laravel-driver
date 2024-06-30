@@ -1,10 +1,10 @@
 <?php
 
-namespace Wanwire\LaravelEloquentRqlite;
+namespace Wanwire\LaravelEloquentRQLite;
 
 use Illuminate\Database\Connection;
-use Wanwire\LaravelEloquentRqlite\Driver\RQLiteConnection;
-use Wanwire\LaravelEloquentRqlite\Driver\RQLiteDriver;
+use Wanwire\LaravelEloquentRQLite\Driver\RQLiteConnection;
+use Wanwire\LaravelEloquentRQLite\Driver\RQLiteDriver;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
