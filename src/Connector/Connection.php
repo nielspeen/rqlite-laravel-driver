@@ -7,14 +7,14 @@ use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\Response;
-use Wanwire\LaravelEloquentRqlite\Driver\RqliteStatement;
+use Wanwire\LaravelEloquentRqlite\Driver\RQLiteStatement;
 use Illuminate\Http\Client\PendingRequest;
 use PDOException;
 
 final class Connection implements \Doctrine\DBAL\Driver\Connection
 {
     private PendingRequest $connection;
-    private RqliteStatement $statement;
+    private RQLiteStatement $statement;
 
     public function __construct(PendingRequest $connection)
     {
@@ -23,7 +23,7 @@ final class Connection implements \Doctrine\DBAL\Driver\Connection
 
     public function prepare(string $sql): Statement
     {
-        $this->statement = new RqliteStatement($sql, $this->connection);
+        $this->statement = new RQLiteStatement($sql, $this->connection);
         return $this->statement;
     }
 

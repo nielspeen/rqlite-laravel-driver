@@ -3,8 +3,8 @@
 namespace Wanwire\LaravelEloquentRqlite;
 
 use Illuminate\Database\Connection;
-use Wanwire\LaravelEloquentRqlite\Driver\RqliteDriver;
-use Illuminate\Database\SQLiteConnection;
+use Wanwire\LaravelEloquentRqlite\Driver\RqliteConnection;
+use Wanwire\LaravelEloquentRqlite\Driver\RQLiteDriver;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -13,14 +13,14 @@ class LaravelEloquentRqliteServiceProvider extends PackageServiceProvider
     public function register(): void
     {
         Connection::resolverFor('rqlite', function ($connection, $database, $prefix, $config) {
-            return new SQLiteConnection($connection, $database, $prefix, $config);
+            return new RQLiteConnection($connection, $database, $prefix, $config);
         });
     }
 
     public function boot()
     {
         $this->app->bind('db.connector.rqlite', function () {
-            return new RqliteDriver();
+            return new RQLiteDriver();
         });
     }
 

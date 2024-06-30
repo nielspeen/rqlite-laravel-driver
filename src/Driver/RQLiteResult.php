@@ -4,7 +4,7 @@ namespace Wanwire\LaravelEloquentRqlite\Driver;
 
 use Doctrine\DBAL\Driver\Exception;
 
-class RqliteResult implements \Doctrine\DBAL\Driver\Result
+class RQLiteResult implements \Doctrine\DBAL\Driver\Result
 {
     /**
      * @var array

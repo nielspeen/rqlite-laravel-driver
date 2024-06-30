@@ -8,11 +8,8 @@ use Wanwire\LaravelEloquentRqlite\Connector\Connection;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
-class RqliteDriver extends AbstractSQLiteDriver
+class RQLiteDriver extends AbstractSQLiteDriver
 {
-    public function prepare()
-    {
-    }
 
     public function connect(array $params): Connection
     {
@@ -54,4 +51,5 @@ class RqliteDriver extends AbstractSQLiteDriver
                 return $attempt * $backoff;
             })->baseUrl("http://{$params['host']}:{$params['port']}");
     }
+
 }

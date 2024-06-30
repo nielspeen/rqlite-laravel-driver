@@ -6,14 +6,15 @@ use Doctrine\DBAL\Driver\Result;
 
 use Doctrine\DBAL\ParameterType;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PDO;
 use PDOException;
 use PDOStatement;
 
-//class RqliteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Statement
-class RqliteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Statement
+//class RQLiteStatement extends \PDOStatement implements \Doctrine\DBAL\Driver\Statement
+class RQLiteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Statement
 {
     private string $sql;
     private PendingRequest $connection;
@@ -56,7 +57,7 @@ class RqliteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
     #[\ReturnTypeWillChange]
     public function execute($params = null): Result
     {
-        return new RqliteResult($this->requestRqliteByHttp());
+        return new RQLiteResult($this->requestRqliteByHttp());
     }
 
     public function fetchAll(int $mode = PDO::FETCH_DEFAULT, mixed ...$args): array
@@ -114,11 +115,12 @@ class RqliteStatement extends PDOStatement implements \Doctrine\DBAL\Driver\Stat
         $retryCount = 3;
         $retryDelayMicroseconds = 250000; // 250 milliseconds
         $attempts = 0;
+        $consistencyLevel = DB::connection('rqlite')->getConsistencyLevel();
 
         while ($attempts < $retryCount) {
             try {
                 if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
-                    $uri = '/db/query?level=strong';
+                    $uri = '/db/query?level=' . $consistencyLevel . '&timings=true';
                 } else {
                     $uri = '/db/execute';
                 }

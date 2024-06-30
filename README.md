@@ -23,44 +23,36 @@ We use sqlite for reads, rqlite for writes:
         
         'rqlite' => [
             'driver' => env('DB_RQLITE_CONNECTION', 'rqlite'),
-            'read' => [
-                'driver' => 'sqlite',
-                'url' => env('DATABASE_URL'),
-                'database' => env('DB_RQLITE_DATABASE', '/var/lib/rqlite/db.sqlite'),
-                'prefix' => '',
-                'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-                'options' => [
-                    PDO::ATTR_PERSISTENT => true,
-                    PDO::SQLITE_OPEN_READONLY => true,
-                ],
-            ],
-            'write' => [
-                'driver' => env('DB_RQLITE_CONNECTION', 'rqlite'),
-                'database' => env('DB_RQLITE_DATABASE', ':memory:'),
-                'host' => env('DB_RQLITE_HOST', '127.0.0.1'),
-                'port' => env('DB_RQLITE_PORT', '4001'),
-                'username' => env('DB_RQLITE_USERNAME', ''),
-                'password' => env('DB_RQLITE_PASSWORD', ''),
-            ],
-            'sticky' => false,
+            'driver' => env('DB_RQLITE_CONNECTION', 'rqlite'),
+            'database' => env('DB_RQLITE_DATABASE', ':memory:'),
+            'host' => env('DB_RQLITE_HOST', '127.0.0.1'),
+            'port' => env('DB_RQLITE_PORT', '4001'),
+            'username' => env('DB_RQLITE_USERNAME', ''),
+            'password' => env('DB_RQLITE_PASSWORD', ''),
         ],
         // ...
    ]
 ```
 
-Note that the directory containing the sqlite database, and the database itself, must be writable by the 
-webserver user. See https://sqlite.org/forum/forumpost/8784c7deb9847215 for more information. 
+Use the included RQLiteQueryBuilder trait on models where you want to specify consistency levels.
 
-If you don't do this, you'll get confusing errors:
+By default all queries are executed with strong consistency.
 
+You can specify the consistency level by using the following methods:
+
+```php
+use Wanwire\LaravelEloquentRqlite\RQLiteQueryBuilder;
+
+protected string $consistency = 'weak'; // or 'strong' or 'none'
 ```
-SQLSTATE[HY000]: General error: 8 attempt to write a readonly database (Connection: rqlite, SQL: select * from "servers" where "servers"."id" = 416 limit 1)
-```
 
-When we want a more consistent read, and don't want to use the sticky option, we can do something like:
+and override them during queries:
 
-```
-Model::onWriteConnection()->find(1);
+```php
+
+User::noConsistency()->find(1);
+User::weakConsistency()->find(1);
+User::strongConsistency()->find(1);
 ```
 
 ## Credits
