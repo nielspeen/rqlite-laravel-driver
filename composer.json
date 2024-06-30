@@ -5,6 +5,8 @@
         "hushulin",
         "nielspeen",
         "laravel",
+        "eloquent",
+        "rqlite",
         "laravel-eloquent-rqlite"
     ],
     "homepage": "https://github.com/nielspeen/laravel-eloquent-rqlite",
@@ -12,6 +14,7 @@
     "authors": [
         {
             "name": "nielspeen",
+            "email": "hello@nielspeen.com",
             "role": "Developer"
         },
         {
@@ -22,9 +25,9 @@
     ],
     "require": {
         "illuminate/contracts": "^11.0",
-        "spatie/laravel-package-tools": "^1.12.1",
         "ext-json": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "nunomaduro/collision": "^5.0",
@@ -55,11 +58,8 @@
     "extra": {
         "laravel": {
             "providers": [
-              "LaravelEloquentRQLiteServiceProvider"
-            ],
-            "aliases": {
-                "LaravelEloquentRqlite": "Wanwire\\LaravelEloquentRQLite\\Facades\\LaravelEloquentRQLite"
-            }
+              "Wanwire\\LaravelEloquentRQLite\\LaravelEloquentRQLiteServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",

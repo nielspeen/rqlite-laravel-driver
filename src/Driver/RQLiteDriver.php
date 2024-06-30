@@ -4,7 +4,7 @@ namespace Wanwire\LaravelEloquentRQLite\Driver;
 
 use Doctrine\DBAL\Driver\AbstractSQLiteDriver;
 use Exception;
-use Wanwire\LaravelEloquentRqlite\Connector\Connection;
+use Wanwire\LaravelEloquentRQLite\Connector\Connection;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 

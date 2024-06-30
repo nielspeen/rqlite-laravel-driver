@@ -1,4 +1,4 @@
-# Laravel driver for Rqlite
+# Laravel driver for RQLite
 
 I modified huhsulin's code to make it work within my Laravel 11 projects. It is by no means complete. 
 
@@ -12,18 +12,12 @@ You can install the package via composer:
 composer require nielspeen/laravel-eloquent-rqlite
 ```
 
-lumen framework add below to bootstrap/app.php
+Sample configuration:
 
-```php
-$app->register(Wanwire\LaravelEloquentRqlite\LaravelEloquentRQLiteServiceProvider::class);
-```
-
-We use sqlite for reads, rqlite for writes:
 ```php 
 'connections' => [
         
         'rqlite' => [
-            'driver' => env('DB_RQLITE_CONNECTION', 'rqlite'),
             'driver' => env('DB_RQLITE_CONNECTION', 'rqlite'),
             'database' => env('DB_RQLITE_DATABASE', ':memory:'),
             'host' => env('DB_RQLITE_HOST', '127.0.0.1'),
@@ -37,17 +31,19 @@ We use sqlite for reads, rqlite for writes:
 
 Use the included RQLiteQueryBuilder trait on models where you want to specify consistency levels.
 
-By default all queries are executed with strong consistency.
+By default, all queries are executed with **strong** consistency.
 
-You can specify the consistency level by using the following methods:
+You can specify the consistency level by using the following methods.
+
+In your Model:
 
 ```php
-use Wanwire\LaravelEloquentRqlite\RQLiteQueryBuilder;
+use Wanwire\LaravelEloquentRQLite\RQLiteQueryBuilder;
 
 protected string $consistency = 'weak'; // or 'strong' or 'none'
 ```
 
-and override them during queries:
+Using the custom query builder:
 
 ```php
 
