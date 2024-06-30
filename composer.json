@@ -55,7 +55,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Wanwire\\LaravelEloquentRqlite\\LaravelEloquentRqliteServiceProvider"
+              "LaravelEloquentRQLiteServiceProvider"
             ],
             "aliases": {
                 "LaravelEloquentRqlite": "Wanwire\\LaravelEloquentRqlite\\Facades\\LaravelEloquentRqlite"

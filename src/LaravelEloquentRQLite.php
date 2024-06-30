@@ -2,6 +2,6 @@
 
 namespace Wanwire\LaravelEloquentRqlite;
 
-class LaravelEloquentRqlite
+class LaravelEloquentRQLite
 {
 }

@@ -13,8 +13,9 @@ composer require nielspeen/laravel-eloquent-rqlite
 ```
 
 lumen framework add below to bootstrap/app.php
+
 ```php
-$app->register(Wanwire\LaravelEloquentRqlite\LaravelEloquentRqliteServiceProvider::class);
+$app->register(Wanwire\LaravelEloquentRqlite\LaravelEloquentRQLiteServiceProvider::class);
 ```
 
 We use sqlite for reads, rqlite for writes:

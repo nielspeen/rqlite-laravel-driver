@@ -32,6 +32,7 @@ class RQLiteDriver extends AbstractSQLiteDriver
             $retries = 2;
             $backoff = 100;
         }
+
         if (!empty($params['username'])) {
             return Http::connectTimeout($connectTimeout)
                 ->withHeader('Connection', 'keep-alive')

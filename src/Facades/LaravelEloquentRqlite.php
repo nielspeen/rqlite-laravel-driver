@@ -8,6 +8,6 @@ class LaravelEloquentRqlite extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Wanwire\LaravelEloquentRqlite\LaravelEloquentRqlite::class;
+        return \Wanwire\LaravelEloquentRqlite\LaravelEloquentRQLite::class;
     }
 }
