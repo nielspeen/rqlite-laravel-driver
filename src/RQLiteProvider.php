@@ -5,8 +5,8 @@ namespace Wanwire\RQLite;
 use Illuminate\Support\ServiceProvider;
 use Wanwire\RQLite\Connect\Connection;
 use Wanwire\RQLite\Connect\Connector;
-use Illuminate\Database\Eloquent\Builder;
-use Wanwire\RQLite\Driver\EloquentBuilder;
+use Illuminate\Database\Eloquent\Builder as BaseBuilder;
+use Wanwire\RQLite\Eloquent\Builder;
 
 class RQLiteProvider extends ServiceProvider
 {
@@ -16,7 +16,7 @@ class RQLiteProvider extends ServiceProvider
             return new Connection($connection, $database, $prefix, $config);
         });
 
-        $this->app->bind(Builder::class, EloquentBuilder::class);
+        $this->app->bind(BaseBuilder::class, Builder::class);
 
     }
 
