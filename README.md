@@ -1,4 +1,16 @@
-# RQLite driver for Laravel
+# RQLite Driver for Laravel
+
+## Supported
+
+* Eloquent Queries
+* Read Consistency: Strong, Weak or None
+* Read Freshness & Strict Freshness
+
+## Not (yet) Supported
+
+* Bulk Writes
+* Bulk Selects
+* Transactions
 
 ## Installation
 
@@ -32,34 +44,42 @@ Sample ```config/database.php``` configuration:
    ]
 ```
 
-Note that the database **db** name is ignored as rqlite currently supports only 1 single database. I recommend you specify
+Note that the database **db** name is ignored as RQLite currently supports only a single database. I recommend you specify
 a database name anyway, for maximum compatibility with Laravel.
 
-Use the included QueryBuilder trait on models where you want to specify consistency levels.
+## Usage
 
-By default, all queries are executed with **strong** consistency.
+By default, all queries are executed with **strong** consistency. You can specify the consistency level by using the 
+methods show below.
 
-You can specify the consistency level by using the following methods.
-
-In your Model:
+### Using a Model Trait
 
 ```php
-use Wanwire\RQLite\QueryBuilder as RQLiteQueryBuilder;
+use Wanwire\RQLite\PDO\PDO;
+use Wanwire\RQLite\WithRQLiteBuilder;
 
 class MyModel extends Model   
 
 {
-    use RQLiteQueryBuilder;
-    protected string $consistency = 'weak'; // or 'strong' or 'none'
+    use WithRQLiteBuilder;
+    protected string $consistency = PDO::RQLITE_CONSISTENCY_STRONG; // or '_WEAK' or '_NONE'
 ```
 
-Using the custom query builder:
+### Extended RQLite Models
+
+```php
+use \Wanwire\RQLite\Models\WeakConsistencyModel;
+
+class MyModel extends WeakConsistencyModel
+```
+
+### Using the query builder:
 
 ```php
 
-User::noConsistency()->find(1);
-User::weakConsistency()->find(1);
-User::strongConsistency()->find(1);
+User::noConsistency()->where('admin', 1)->find(1);
+User::weakConsistency()->find(323);
+User::strongConsistency()->find(747);
 ```
 
 ## Credits

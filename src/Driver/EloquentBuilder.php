@@ -4,20 +4,14 @@ namespace Wanwire\RQLite\Driver;
 
 use Illuminate\Database\Eloquent\Builder;
 use Wanwire\RQLite\Connect\Connection;
+use Wanwire\RQLite\Exceptions\RQLiteDriverException;
 use Wanwire\RQLite\PDO\PDO;
 
 class EloquentBuilder extends Builder
 {
     protected string $consistencyLevel = 'strong';
-
-    protected function newBaseQueryBuilder(): \Illuminate\Database\Query\Builder
-    {
-        $connection = $this->getConnection();
-
-        return new \Illuminate\Database\Query\Builder(
-            $connection, $connection->getQueryGrammar(), $connection->getPostProcessor()
-        );
-    }
+    protected ?int $freshness = null;
+    protected ?int $strictFreshness = null;
 
     public function addConsistencyLevel($level): static
     {
@@ -26,17 +20,43 @@ class EloquentBuilder extends Builder
         return $this;
     }
 
-    protected function applyConsistencyLevel(): void
+    public function addFreshness(?int $seconds): static
+    {
+        if($this->strictFreshness) {
+            throw new RQLiteDriverException('You cannot set both freshness and strict freshness at the same time');
+        }
+
+        $this->freshness = $seconds;
+
+        return $this;
+    }
+
+    public function addStrictFreshness(?int $seconds): static
+    {
+        if($this->freshness) {
+            throw new RQLiteDriverException('You cannot set both freshness and strict freshness at the same time');
+        }
+
+        $this->strictFreshness = $seconds;
+
+        return $this;
+    }
+
+    protected function applyParameters(): void
     {
         if ($this->query->connection instanceof Connection) {
             $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_CONSISTENCY, $this->consistencyLevel);
+            $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_FRESHNESS, $this->freshness);
+            $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_FRESHNESS_STRICT, $this->strictFreshness);
         }
     }
 
-    protected function resetConsistencyLevel(): void
+    protected function resetParameters(): void
     {
         if ($this->query->connection instanceof Connection) {
             $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_CONSISTENCY, 'strong');
+            $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_FRESHNESS, null);
+            $this->query->connection->getPdo()->setAttribute(PDO::RQLITE_ATTR_FRESHNESS_STRICT, null);
         }
     }
 
@@ -64,9 +84,9 @@ class EloquentBuilder extends Builder
 
     protected function runQueryWithConsistencyLevel($query, $bindings, \Closure $callback)
     {
-        $this->applyConsistencyLevel();
+        $this->applyParameters();
         $result = $callback($query, $bindings);
-        $this->resetConsistencyLevel();
+        $this->resetParameters();
 
         return $result;
     }

@@ -2,8 +2,6 @@
 
 namespace Wanwire\RQLite\PDO;
 
-use Doctrine\DBAL\Driver\Result;
-use Doctrine\DBAL\ParameterType;
 use PDO as BasePDO;
 use PDOException;
 use ReturnTypeWillChange;
@@ -15,6 +13,13 @@ class PDO extends BasePDO implements PDOInterface
     private const DEFAULT_PORT = '4001';
 
     public const RQLITE_ATTR_CONSISTENCY = 1;
+    public const RQLITE_ATTR_FRESHNESS = 2;
+    public const RQLITE_ATTR_FRESHNESS_STRICT = 3;
+
+    public const RQLITE_CONSISTENCY_NONE = 'none';
+    public const RQLITE_CONSISTENCY_WEAK = 'weak';
+    public const RQLITE_CONSISTENCY_STRONG = 'strong';
+
 
     private const DSN_REGEX = '/^rqlite:(?:host=([^;]*))?(?:;port=([^;]*))?(?:;username=([^;]*))?(?:;password=([^;]*))?$/';
     private \CurlHandle $connection;
@@ -23,6 +28,8 @@ class PDO extends BasePDO implements PDOInterface
 
     private array $attributes = [
         'consistency' => 'strong',
+        'freshness' => null,
+        'strict_freshness' => null,
     ];
 
     /** @noinspection PhpMissingParentConstructorInspection */
@@ -50,7 +57,7 @@ class PDO extends BasePDO implements PDOInterface
         $this->baseUrl = "http://{$params['host']}:{$params['port']}";
     }
 
-    private static function parseDSN($dsn)
+    private static function parseDSN($dsn): array
     {
         $matches = [];
 
@@ -68,17 +75,12 @@ class PDO extends BasePDO implements PDOInterface
 
     public function beginTransaction(): bool
     {
-        throw new PDOException('BEGIN invalid for rqlite.');
+        throw new PDOException('BEGIN invalid for RQLite.');
     }
 
     public function commit(): bool
     {
-        throw new PDOException('COMMIT invalid for rqlite.');
-    }
-
-    public function exec($statement): int
-    {
-        return $this->prepare($statement)->execute()->rowCount();
+        throw new PDOException('COMMIT invalid for RQLite.');
     }
 
     public function getAttribute(int $attribute): mixed
@@ -91,6 +93,11 @@ class PDO extends BasePDO implements PDOInterface
         return null;
     }
 
+    public function inTransaction(): bool
+    {
+        return false;
+    }
+
     public function lastInsertId($name = null): string
     {
         return (string) $this->lastStatement->lastInsertId;
@@ -99,22 +106,17 @@ class PDO extends BasePDO implements PDOInterface
 
     #[ReturnTypeWillChange] public function prepare(string $query, array $options = [])
     {
-        // we need to store this so we can extract the lastInsertId
-        $this->lastStatement = new PDOStatement($query, $this->connection, $this->baseUrl, $this->attributes['consistency']);
+        $this->lastStatement = new PDOStatement(
+            $query,
+            $this->connection,
+            $this->baseUrl,
+            $this->attributes
+        );
         return $this->lastStatement;
-    }
-
-    public function query(?string $query = null, ?int $fetchMode = null, mixed ...$fetchModeArgs): Result
-    {
-        return $this->prepare($query)->execute();
     }
 
     public function quote(string $string, $type = BasePDO::PARAM_STR): string|false
     {
-//        if (is_int($string) || is_float($string)) {
-//            return $string;
-//        }
-
         $string = str_replace("'", "''", $string);
 
         return "'".addcslashes($string, "\000\n\r\\\032")."'";
@@ -122,7 +124,7 @@ class PDO extends BasePDO implements PDOInterface
 
     public function rollBack(): bool
     {
-        throw new PDOException('ROLLBACK invalid for rqlite.');
+        throw new PDOException('ROLLBACK invalid for RQLite.');
     }
 
     public function setAttribute($attribute, $value): bool
@@ -130,6 +132,12 @@ class PDO extends BasePDO implements PDOInterface
         switch ($attribute) {
             case self::RQLITE_ATTR_CONSISTENCY:
                 $this->attributes['consistency'] = $value;
+                break;
+            case self::RQLITE_ATTR_FRESHNESS:
+                $this->attributes['freshness'] = $value;
+                break;
+            case self::RQLITE_ATTR_FRESHNESS_STRICT:
+                $this->attributes['strict_freshness'] = $value;
                 break;
         }
 
