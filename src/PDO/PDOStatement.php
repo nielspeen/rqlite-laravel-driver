@@ -91,19 +91,6 @@ class PDOStatement extends BasePDOStatement
         return $tmp;
     }
 
-    private function instantiateFetchClass(array $row)
-    {
-        $className = $this->fetchClassName ?? 'stdClass';
-        $params = $this->fetchParams;
-
-        if ($params) {
-            $reflectionClass = new \ReflectionClass($className);
-            return $reflectionClass->newInstanceArgs($params);
-        } else {
-            return new $className($row);
-        }
-    }
-
     private function makeRequestData(string $sql, array $parameterizedMap): array
     {
         return [[$sql, ...$parameterizedMap]];

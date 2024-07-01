@@ -7,6 +7,9 @@ use Wanwire\RQLite\PDO\PDO;
 
 class Connector extends SQLiteConnector
 {
+    /**
+     * @throws \Exception
+     */
     public function connect(array $config): \PDO|PDO
     {
         $options = $this->getOptions($config);

@@ -8,8 +8,9 @@ interface PDOInterface
 {
     public function beginTransaction(): bool;
     public function commit(): bool;
-//    public function errorCode();
-//    public function errorInfo();
+    // TODO: Uncomment the following lines and implement the methods
+    //    public function errorCode();
+    //    public function errorInfo();
     public function getAttribute(int $attribute): mixed;
     public function inTransaction(): bool;
     public function lastInsertId(?string $name = null): string;

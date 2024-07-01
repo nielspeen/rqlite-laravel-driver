@@ -2,6 +2,7 @@
 
 namespace Wanwire\RQLite\Connect;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\SQLiteConnection;
 use Wanwire\RQLite\PDO\PDO;
 
@@ -16,6 +17,5 @@ class Connection extends SQLiteConnection
     {
         return $this->getPdo()->getAttribute(PDO::RQLITE_ATTR_CONSISTENCY);
     }
-
 
 }

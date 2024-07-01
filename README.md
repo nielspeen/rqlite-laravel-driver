@@ -82,6 +82,13 @@ User::weakConsistency()->find(323);
 User::strongConsistency()->find(747);
 ```
 
+### Warning
+
+The consistency level is not reset after a query is executed. Consecutive queries will use the same consistency level 
+unless a new consistency level is set using the Trait, the Models, or the query builder.
+
+This approach ensures that eager loading uses the same consistency level as the primary model being queried.
+
 ## Credits
 
 - [nielspeen][https://github.com/nielspeen)

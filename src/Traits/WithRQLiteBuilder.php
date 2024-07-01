@@ -2,17 +2,17 @@
 
 namespace Wanwire\RQLite\Traits;
 
-use Wanwire\RQLite\Driver\EloquentBuilder;
+use Wanwire\RQLite\Eloquent\Builder;
 use Wanwire\RQLite\PDO\PDO;
 
 trait WithRQLiteBuilder
 {
-    public function newEloquentBuilder($query): EloquentBuilder
+    public function newEloquentBuilder($query): Builder
     {
-        $builder = new EloquentBuilder($query);
+        $builder = new Builder($query);
 
         if ($this->consistencyLevel) {
-            $query->addConsistencyLevel($this->consistencyLevel);
+            $builder->addConsistencyLevel($this->consistencyLevel);
         }
 
         return $builder;
