@@ -18,6 +18,7 @@ class PDOStatement extends BasePDOStatement
     private string $consistency = 'strong';
     private ?int $freshness = null;
     private ?int $strictFreshness = null;
+    private bool $queuedWrites = false;
 
     public ?int $lastInsertId = null;
     public ?int $rowsAffected = null;
@@ -42,6 +43,9 @@ class PDOStatement extends BasePDOStatement
         }
         if (isset($params['strict_freshness'])) {
             $this->strictFreshness = $params['strict_freshness'];
+        }
+        if (isset($params['queued_writes'])) {
+            $this->queuedWrites = $params['queued_writes'];
         }
     }
 
@@ -105,6 +109,9 @@ class PDOStatement extends BasePDOStatement
         }
         if($this->strictFreshness) {
             $params .= '&strict_freshness=' . $this->strictFreshness;
+        }
+        if($this->queuedWrites) {
+            $params .= '&queue';
         }
 
         return $params;

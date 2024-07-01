@@ -10,6 +10,7 @@ use Wanwire\RQLite\PDO\PDO;
 class Builder extends BaseBuilder
 {
     protected string $consistencyLevel = 'strong';
+    protected bool $queuedWrites = false;
     protected ?int $freshness = null;
     protected ?int $strictFreshness = null;
 
@@ -37,6 +38,13 @@ class Builder extends BaseBuilder
         return $this;
     }
 
+    public function addQueuedWrites(): static
+    {
+        $this->queuedWrites = true;
+        return $this;
+    }
+
+
     protected function applyParameters(): void
     {
         if ($this->query->connection instanceof Connection) {
@@ -44,6 +52,7 @@ class Builder extends BaseBuilder
             $pdo->setAttribute(PDO::RQLITE_ATTR_CONSISTENCY, $this->consistencyLevel);
             $pdo->setAttribute(PDO::RQLITE_ATTR_FRESHNESS, $this->freshness);
             $pdo->setAttribute(PDO::RQLITE_ATTR_FRESHNESS_STRICT, $this->strictFreshness);
+            $pdo->setAttribute(PDO::RQLITE_ATTR_QUEUED_WRITES, $this->queuedWrites);
         }
     }
 

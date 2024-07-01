@@ -15,6 +15,7 @@ class PDO extends BasePDO implements PDOInterface
     public const RQLITE_ATTR_CONSISTENCY = 1;
     public const RQLITE_ATTR_FRESHNESS = 2;
     public const RQLITE_ATTR_FRESHNESS_STRICT = 3;
+    public const RQLITE_ATTR_QUEUED_WRITES = 4;
 
     public const RQLITE_CONSISTENCY_NONE = 'none';
     public const RQLITE_CONSISTENCY_WEAK = 'weak';
@@ -30,6 +31,7 @@ class PDO extends BasePDO implements PDOInterface
         'consistency' => 'strong',
         'freshness' => null,
         'strict_freshness' => null,
+        'queued_writes' => false,
     ];
 
     /** @noinspection PhpMissingParentConstructorInspection */
@@ -138,6 +140,9 @@ class PDO extends BasePDO implements PDOInterface
                 break;
             case self::RQLITE_ATTR_FRESHNESS_STRICT:
                 $this->attributes['strict_freshness'] = $value;
+                break;
+            case self::RQLITE_ATTR_QUEUED_WRITES:
+                $this->attributes['queued_writes'] = $value;
                 break;
         }
 

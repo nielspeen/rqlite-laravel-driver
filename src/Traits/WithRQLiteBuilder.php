@@ -47,4 +47,9 @@ trait WithRQLiteBuilder
     {
         return $query->addConsistencyLevel($level);
     }
+
+    public function scopeQueuedWrites($query)
+    {
+        return $query->addQueuedWrites();
+    }
 }
