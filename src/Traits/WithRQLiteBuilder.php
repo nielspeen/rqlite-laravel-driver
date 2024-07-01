@@ -2,6 +2,7 @@
 
 namespace Wanwire\RQLite\Traits;
 
+use Illuminate\Support\Facades\Log;
 use Wanwire\RQLite\Eloquent\Builder;
 use Wanwire\RQLite\PDO\PDO;
 

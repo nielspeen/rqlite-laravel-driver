@@ -110,6 +110,14 @@ class PDOStatement extends BasePDOStatement
         if($this->strictFreshness) {
             $params .= '&strict_freshness=' . $this->strictFreshness;
         }
+
+        return $params;
+    }
+
+    private function buildExecParams(): string
+    {
+        $params = '?timings=true';
+
         if($this->queuedWrites) {
             $params .= '&queue';
         }
@@ -122,7 +130,7 @@ class PDOStatement extends BasePDOStatement
         if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
             return $this->baseUrl . '/db/query' . $this->buildQueryParams();
         } else {
-            return $this->baseUrl . '/db/execute';
+            return $this->baseUrl . '/db/execute' . $this->buildExecParams();
         }
     }
 
@@ -148,9 +156,10 @@ class PDOStatement extends BasePDOStatement
         curl_setopt($this->connection, CURLOPT_POSTFIELDS, $jsonOptionData);
         curl_setopt($this->connection, CURLOPT_URL,  $this->buildQueryUrl());
 
+        Log::info("SQL: " . $this->buildQueryUrl() . " - " . $this->sql);
+
         $response = curl_exec($this->connection);
         $httpCode = curl_getinfo($this->connection, CURLINFO_HTTP_CODE);
-
         if ($response === false || $httpCode !== 200) {
             $error = curl_error($this->connection);
             curl_close($this->connection);

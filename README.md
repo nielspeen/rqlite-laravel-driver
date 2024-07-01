@@ -5,6 +5,7 @@
 * Eloquent Queries
 * Read Consistency: Strong, Weak or None
 * Read Freshness & Strict Freshness
+* Queued Writes
 
 ## Not (yet) Supported
 
@@ -80,6 +81,25 @@ class MyModel extends WeakConsistencyModel
 User::noConsistency()->where('admin', 1)->find(1);
 User::weakConsistency()->find(323);
 User::strongConsistency()->find(747);
+```
+
+### PDO
+
+Sometimes you want to access the PDO object directly. For example:
+
+```php
+$pdo = DB::getPdo();
+
+// Set custom PDO attribute
+$pdo->setAttribute(Wanwire\RQLite\Pdo\PDO::RQLITE_ATTR_QUEUED_WRITES, true);
+
+// Perform a single query to update both columns
+DB::table('users')
+    ->where('user_id', 999)
+    ->update([
+        'bytes_downloaded' => DB::raw("bytes_downloaded + $bytesDownloaded"),
+        'bytes_uploaded' => DB::raw("bytes_uploaded + $bytesUploaded"),
+    ]);
 ```
 
 ### Warning
