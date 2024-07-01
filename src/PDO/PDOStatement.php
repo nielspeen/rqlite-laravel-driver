@@ -3,7 +3,6 @@
 namespace Wanwire\RQLite\PDO;
 
 use CurlHandle;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PDOException;
 use PDOStatement as BasePDOStatement;
@@ -155,8 +154,6 @@ class PDOStatement extends BasePDOStatement
 
         curl_setopt($this->connection, CURLOPT_POSTFIELDS, $jsonOptionData);
         curl_setopt($this->connection, CURLOPT_URL,  $this->buildQueryUrl());
-
-        Log::info("SQL: " . $this->buildQueryUrl() . " - " . $this->sql);
 
         $response = curl_exec($this->connection);
         $httpCode = curl_getinfo($this->connection, CURLINFO_HTTP_CODE);
