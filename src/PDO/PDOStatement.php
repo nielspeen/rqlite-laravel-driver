@@ -77,9 +77,7 @@ class PDOStatement extends BasePDOStatement
                 return true;
             } catch (PDOException $e) {
 
-                if(! app()->isProduction()) {
-                    Log::info($e->getMessage());
-                }
+                Log::info($e->getMessage());
 
             }
         }
