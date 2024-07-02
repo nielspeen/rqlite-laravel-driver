@@ -72,9 +72,6 @@ class PDOStatement extends BasePDOStatement
         if($this->useSQLite()) {
             try {
                 $this->requestRQLiteBySQLite($params);
-
-                $this->debug('Request successfully executed by SQLite: ' . $this->sql);
-
                 return true;
             } catch (PDOException $e) {
 
@@ -236,8 +233,6 @@ class PDOStatement extends BasePDOStatement
             });
         }
 
-        $this->debug('Request successfully executed by RQLite: ' . $this->sql);
-
         $this->processQueryResults($result);
 
         return $result['results'];
@@ -259,11 +254,4 @@ class PDOStatement extends BasePDOStatement
     {
         return $this->readOnly && $this->consistency === PDO::RQLITE_CONSISTENCY_NONE && $this->sqliteConnection;
     }
-    private function debug($message): void
-    {
-        if (app()->environment('staging')) {
-            Log::info($message);
-        }
-    }
-
 }
