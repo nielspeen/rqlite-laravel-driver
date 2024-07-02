@@ -27,7 +27,7 @@ class PDO extends BasePDO implements PDOInterface
     private \CurlHandle $connection;
     private PDOStatement $lastStatement;
     private string $baseUrl;
-    private ?string $sqliteDsn;
+    private ?string $sqliteDsn = null;
 
     private array $attributes = [
         'consistency' => 'strong',

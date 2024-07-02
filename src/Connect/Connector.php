@@ -16,7 +16,7 @@ class Connector extends SQLiteConnector
 
         $dsn = "rqlite:host={$config['host']};port={$config['port']}";
 
-        if($config['sqlite'] !== null) {
+        if(isset($config['sqlite'])) {
             $dsn .= ";{$config['sqlite']}";
         }
 
