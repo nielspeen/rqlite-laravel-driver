@@ -20,6 +20,7 @@ class PDOStatement extends BasePDOStatement
     private ?int $freshness = null;
     private ?int $strictFreshness = null;
     private bool $queuedWrites = false;
+    private bool $debug = true;
 
     public ?int $lastInsertId = null;
     public ?int $rowsAffected = null;
@@ -70,9 +71,7 @@ class PDOStatement extends BasePDOStatement
             try {
                 $this->requestRQLiteBySQLite($params);
 
-                if(! app()->isProduction()) {
-                    Log::info('Request successfully executed by SQLite: ' . $this->sql);
-                }
+                $this->debug('Request successfully executed by SQLite: ' . $this->sql);
 
                 return true;
             } catch (PDOException $e) {
@@ -214,9 +213,7 @@ class PDOStatement extends BasePDOStatement
             });
         }
 
-        if(! app()->isProduction()) {
-            Log::info('Request successfully executed by RQLite: ' . $this->sql);
-        }
+        $this->debug('Request successfully executed by RQLite: ' . $this->sql);
 
         $this->processQueryResults($result);
 
@@ -233,6 +230,13 @@ class PDOStatement extends BasePDOStatement
     public function rowCount(): int
     {
         return $this->rowsAffected ?: 0;
+    }
+
+    private function debug($message): void
+    {
+        if ($this->debug) {
+            Log::info($message);
+        }
     }
 
 }
