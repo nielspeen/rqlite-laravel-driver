@@ -115,7 +115,7 @@ This approach ensures that eager loading uses the same consistency level as the 
 If you have a high traffic website, the overhead of going through RQLite can be significant. With some precautions,
 you can boost performance by reading directly from SQLite. This is applied to queries with **None** consistency only.
 
-In your database.php add an sqlite parameter pointing directly and the dabase:
+In your database.php add a sqlite parameter pointing directly and the dabase:
 
 ```php 
 'connections' => [        
@@ -135,7 +135,7 @@ In your database.php add an sqlite parameter pointing directly and the dabase:
 Secondly, you need to ensure your Laravel application has read-only access to the SQLite database.
 
 Do NOT give your Laravel application write access to the SQLite database. This will corrupt the database! Even in 
-read-only mode, SQLite will occasionally make modification to the database incompatible with RQLite.
+read-only mode, SQLite will occasionally make modifications to the database incompatible with RQLite.
 
 ## Credits
 
