@@ -6,6 +6,7 @@
 * Read Consistency: Strong, Weak or None
 * Read Freshness & Strict Freshness
 * Queued Writes
+* Optional direct reading of SQLite database
 
 ## Not (yet) Supported
 
@@ -39,8 +40,6 @@ Sample ```config/database.php``` configuration:
             'port' => env('DB_RQLITE_PORT', '4001'),
             'username' => env('DB_RQLITE_USERNAME', null),
             'password' => env('DB_RQLITE_PASSWORD', null),
-            //            'sqlite' => 'sqlite:/var/lib/rqlite/db.sqlite',
-
         ],
 
         // ...
@@ -49,8 +48,6 @@ Sample ```config/database.php``` configuration:
 
 Note that the database **db** name is ignored as RQLite currently supports only a single database. I recommend you specify
 a database name anyway, for maximum compatibility with Laravel.
-
-If you specify an sqlite parameter, the driver will try read-only queries using sqlite before falling back to the RQLite.
 
 ## Usage
 
@@ -112,6 +109,33 @@ The consistency level is not reset after a query is executed. Consecutive querie
 unless a new consistency level is set using the Trait, the Models, or the query builder.
 
 This approach ensures that eager loading uses the same consistency level as the primary model being queried.
+
+## Directly reading from SQLite
+
+If you have a high traffic website, the overhead of going through RQLite can be significant. With some precautions,
+you can boost performance by reading directly from SQLite. This is applied to queries with **None** consistency only.
+
+In your database.php add an sqlite parameter pointing directly and the dabase:
+
+```php 
+'connections' => [        
+        'rqlite' => [
+            'driver' => env('DB_RQLITE_CONNECTION', 'rqlite'),
+            'database' => env('DB_RQLITE_DATABASE', 'db'),
+            'host' => env('DB_RQLITE_HOST', '127.0.0.1'),
+            'port' => env('DB_RQLITE_PORT', '4001'),
+            'username' => env('DB_RQLITE_USERNAME', null),
+            'password' => env('DB_RQLITE_PASSWORD', null),
+            'sqlite' => 'sqlite:/var/lib/rqlite/db.sqlite',
+
+        ],
+   ]
+```
+
+Secondly, you need to ensure your Laravel application has read-only access to the SQLite database.
+
+Do NOT give your Laravel application write access to the SQLite database. This will corrupt the database! Even in 
+read-only mode, SQLite will occasionally make modification to the database incompatible with RQLite.
 
 ## Credits
 
