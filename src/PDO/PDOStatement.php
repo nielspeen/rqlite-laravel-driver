@@ -20,7 +20,7 @@ class PDOStatement extends BasePDOStatement
     private ?int $freshness = null;
     private ?int $strictFreshness = null;
     private bool $queuedWrites = false;
-    private bool $debug = true;
+    private bool $readOnly = false;
 
     public ?int $lastInsertId = null;
     public ?int $rowsAffected = null;
@@ -40,6 +40,10 @@ class PDOStatement extends BasePDOStatement
 
         if (!empty($sqliteDsn)) {
             $this->sqliteConnection = new BasePDO($sqliteDsn, null, null, [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]);
+        }
+
+        if(Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
+            $this->readOnly = true;
         }
 
         if (isset($params['consistency'])) {
@@ -65,9 +69,7 @@ class PDOStatement extends BasePDOStatement
 
     public function execute(array|null $params = null): bool
     {
-        if(Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])
-            && $this->consistency === PDO::RQLITE_CONSISTENCY_NONE
-            && $this->sqliteConnection) {
+        if($this->useSQLite()) {
             try {
                 $this->requestRQLiteBySQLite($params);
 
@@ -85,10 +87,30 @@ class PDOStatement extends BasePDOStatement
         return true;
     }
 
+    public function request(): array
+    {
+        if($this->useSQLite()) {
+            try {
+                return $this->requestRQLiteBySQLite();
+            } catch (PDOException $e) {
+
+                Log::info($e->getMessage());
+
+            }
+        }
+
+        return $this->requestRQLiteByHttp();
+    }
+
     public function fetchAll(int $mode = PDO::FETCH_DEFAULT, mixed ...$args): array
     {
         $fetchMode = ($mode === PDO::FETCH_DEFAULT) ? $this->fetchMode : $mode;
-        $results = $this->requestRQLiteByHttp();
+        $results = $this->request();
+
+        // SQLite returns an object
+        if(isset($results[0]) && is_object($results[0])) {
+            return $results;
+        }
 
         if (empty($results)) {
             return [];
@@ -149,7 +171,7 @@ class PDOStatement extends BasePDOStatement
 
     private function buildQueryUrl(): string
     {
-        if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
+        if ($this->readOnly) {
             return $this->baseUrl . '/db/query' . $this->buildQueryParams();
         } else {
             return $this->baseUrl . '/db/execute' . $this->buildExecParams();
@@ -172,17 +194,18 @@ class PDOStatement extends BasePDOStatement
     }
 
 
-    private function requestRQLitebySQLite($params): false|array
+    private function requestRQLitebySQLite(): array
     {
         try {
             $stmt = $this->sqliteConnection->prepare($this->sql);
 
-//            foreach ($params as $key => $value) {
-//                $stmt->bindValue($key, $value);
-//            }
+            foreach ($this->parameterizedMap as $key => $value) {
+                $stmt->bindValue(is_int($key) ? $key + 1 : $key, $value); // SQLite uses 1-based parameter indexing
+            }
 
             $stmt->execute();
-            return $stmt->fetchAll(BasePDO::FETCH_ASSOC);
+
+            return $stmt->fetchAll($this->fetchMode);
         } catch (PDOException $e) {
             throw new PDOException("SQLite request failed: " . $e->getMessage());
         }
@@ -232,9 +255,13 @@ class PDOStatement extends BasePDOStatement
         return $this->rowsAffected ?: 0;
     }
 
+    private function useSQLite(): bool
+    {
+        return $this->readOnly && $this->consistency === PDO::RQLITE_CONSISTENCY_NONE && $this->sqliteConnection;
+    }
     private function debug($message): void
     {
-        if ($this->debug) {
+        if (app()->environment('staging')) {
             Log::info($message);
         }
     }
