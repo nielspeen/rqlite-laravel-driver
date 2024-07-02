@@ -48,6 +48,8 @@ class PDO extends BasePDO implements PDOInterface
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, false);
         curl_setopt($ch, CURLOPT_TCP_NODELAY, true);
         curl_setopt($ch, CURLOPT_TCP_FASTOPEN, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
         if (isset($params['username']) && isset($params['password'])) {
             $username = $params['username'];
