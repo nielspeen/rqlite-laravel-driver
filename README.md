@@ -39,6 +39,8 @@ Sample ```config/database.php``` configuration:
             'port' => env('DB_RQLITE_PORT', '4001'),
             'username' => env('DB_RQLITE_USERNAME', null),
             'password' => env('DB_RQLITE_PASSWORD', null),
+            //            'sqlite' => 'sqlite:/var/lib/rqlite/db.sqlite',
+
         ],
 
         // ...
@@ -47,6 +49,8 @@ Sample ```config/database.php``` configuration:
 
 Note that the database **db** name is ignored as RQLite currently supports only a single database. I recommend you specify
 a database name anyway, for maximum compatibility with Laravel.
+
+If you specify an sqlite parameter, the driver will try read-only queries using sqlite before falling back to the RQLite.
 
 ## Usage
 

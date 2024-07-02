@@ -2,6 +2,8 @@
 
 namespace Wanwire\RQLite\PDO;
 
+use Illuminate\Support\Facades\Log;
+use PDO as BasePDO;
 use CurlHandle;
 use Illuminate\Support\Str;
 use PDOException;
@@ -27,12 +29,17 @@ class PDOStatement extends BasePDOStatement
     private int $fetchMode = PDO::FETCH_ASSOC;
     private ?string $fetchClassName = null;
     private array $fetchParams = [];
+    private ?BasePDO $sqliteConnection = null;
 
-    public function __construct(string $sql, $connection, $baseUrl, $params)
+    public function __construct(string $sql, $connection, $baseUrl, $params, $sqliteDsn)
     {
         $this->sql = $sql;
         $this->connection = $connection;
         $this->baseUrl = $baseUrl;
+
+        if (!empty($sqliteDsn)) {
+            $this->sqliteConnection = new BasePDO($sqliteDsn, null, null, [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]);
+        }
 
         if (isset($params['consistency'])) {
             $this->consistency = $params['consistency'];
@@ -57,8 +64,27 @@ class PDOStatement extends BasePDOStatement
 
     public function execute(array|null $params = null): bool
     {
-        $this->requestRQLiteByHttp();
+        if(Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])
+            && $this->consistency === PDO::RQLITE_CONSISTENCY_NONE
+            && $this->sqliteConnection) {
+            try {
+                $this->requestRQLiteBySQLite($params);
 
+                if(! app()->isProduction()) {
+                    Log::info('Request successfully executed by SQLite: ' . $this->sql);
+                }
+
+                return true;
+            } catch (PDOException $e) {
+
+                if(! app()->isProduction()) {
+                    Log::info($e->getMessage());
+                }
+
+            }
+        }
+
+        $this->requestRQLiteByHttp();
         return true;
     }
 
@@ -148,6 +174,23 @@ class PDOStatement extends BasePDOStatement
         }
     }
 
+
+    private function requestRQLitebySQLite($params): false|array
+    {
+        try {
+            $stmt = $this->sqliteConnection->prepare($this->sql);
+
+//            foreach ($params as $key => $value) {
+//                $stmt->bindValue($key, $value);
+//            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(BasePDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new PDOException("SQLite request failed: " . $e->getMessage());
+        }
+    }
+
     private function requestRQLiteByHttp()
     {
         $jsonOptionData = json_encode($this->makeRequestData($this->sql, $this->parameterizedMap));
@@ -171,6 +214,10 @@ class PDOStatement extends BasePDOStatement
                     throw new PDOException($item['error']);
                 }
             });
+        }
+
+        if(! app()->isProduction()) {
+            Log::info('Request successfully executed by RQLite: ' . $this->sql);
         }
 
         $this->processQueryResults($result);

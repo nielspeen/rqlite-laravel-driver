@@ -22,10 +22,12 @@ class PDO extends BasePDO implements PDOInterface
     public const RQLITE_CONSISTENCY_STRONG = 'strong';
 
 
-    private const DSN_REGEX = '/^rqlite:(?:host=([^;]*))?(?:;port=([^;]*))?(?:;username=([^;]*))?(?:;password=([^;]*))?$/';
+    private const DSN_REGEX = '/^rqlite:(?:host=([^;]*))?(?:;port=([^;]*))?(?:;username=([^;]*))?(?:;password=([^;]*))?;?(sqlite:.*)?$/';
+
     private \CurlHandle $connection;
     private PDOStatement $lastStatement;
     private string $baseUrl;
+    private ?string $sqliteDsn;
 
     private array $attributes = [
         'consistency' => 'strong',
@@ -59,6 +61,9 @@ class PDO extends BasePDO implements PDOInterface
 
         $this->connection = $ch;
         $this->baseUrl = "http://{$params['host']}:{$params['port']}";
+        if($params['sqlite']) {
+            $this->sqliteDsn = $params['sqlite'];
+        }
     }
 
     private static function parseDSN($dsn): array
@@ -74,6 +79,7 @@ class PDO extends BasePDO implements PDOInterface
             'port' => !empty($matches[2]) ? $matches[2] : self::DEFAULT_PORT,
             'username' => !empty($matches[3]) ? $matches[3] : null,
             'password' => !empty($matches[4]) ? $matches[4] : null,
+            'sqlite' => !empty($matches[5]) ? $matches[5] : null,
         ];
     }
 
@@ -114,7 +120,8 @@ class PDO extends BasePDO implements PDOInterface
             $query,
             $this->connection,
             $this->baseUrl,
-            $this->attributes
+            $this->attributes,
+            $this->sqliteDsn
         );
         return $this->lastStatement;
     }
