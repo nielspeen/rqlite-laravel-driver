@@ -39,10 +39,15 @@ class PDOStatement extends BasePDOStatement
         $this->baseUrl = $baseUrl;
 
         if (!empty($sqliteDsn)) {
-            $this->sqliteConnection = new BasePDO($sqliteDsn, null, null, [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]);
+            $this->sqliteConnection = new BasePDO(
+                $sqliteDsn,
+                null,
+                null,
+                [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]
+            );
         }
 
-        if(Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
+        if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
             $this->readOnly = true;
         }
 
@@ -69,14 +74,22 @@ class PDOStatement extends BasePDOStatement
 
     public function execute(array|null $params = null): bool
     {
-        if($this->useSQLite()) {
+        if ($this->useSQLite()) {
             try {
                 $this->requestRQLiteBySQLite($params);
                 return true;
             } catch (PDOException $e) {
-
-                Log::info($e->getMessage());
-
+                if (app()->hasDebugModeEnabled()) {
+                    /*
+                     * SQLite queries will occasionally experience 'trying to write to read-only database' errors.
+                     * That's because we don't allow PHP write operations on the SQLite database. See README.md.
+                     *
+                     * When this, or any other error occurs, we quietly fall back to the RQLite HTTP request method.
+                     *
+                     * Failures are logged when debugging is enabled.
+                     */
+                    Log::info($e->getMessage());
+                }
             }
         }
 
@@ -86,13 +99,11 @@ class PDOStatement extends BasePDOStatement
 
     public function request(): array
     {
-        if($this->useSQLite()) {
+        if ($this->useSQLite()) {
             try {
                 return $this->requestRQLiteBySQLite();
             } catch (PDOException $e) {
-
                 Log::info($e->getMessage());
-
             }
         }
 
@@ -105,7 +116,7 @@ class PDOStatement extends BasePDOStatement
         $results = $this->request();
 
         // SQLite returns an object
-        if(isset($results[0]) && is_object($results[0])) {
+        if (isset($results[0]) && is_object($results[0])) {
             return $results;
         }
 
@@ -145,10 +156,10 @@ class PDOStatement extends BasePDOStatement
     {
         $params = '?level=' . $this->consistency . '&timings=true';
 
-        if($this->freshness) {
+        if ($this->freshness) {
             $params .= '&freshness=' . $this->freshness;
         }
-        if($this->strictFreshness) {
+        if ($this->strictFreshness) {
             $params .= '&strict_freshness=' . $this->strictFreshness;
         }
 
@@ -159,7 +170,7 @@ class PDOStatement extends BasePDOStatement
     {
         $params = '?timings=true';
 
-        if($this->queuedWrites) {
+        if ($this->queuedWrites) {
             $params .= '&queue';
         }
 
@@ -213,7 +224,7 @@ class PDOStatement extends BasePDOStatement
         $jsonOptionData = json_encode($this->makeRequestData($this->sql, $this->parameterizedMap));
 
         curl_setopt($this->connection, CURLOPT_POSTFIELDS, $jsonOptionData);
-        curl_setopt($this->connection, CURLOPT_URL,  $this->buildQueryUrl());
+        curl_setopt($this->connection, CURLOPT_URL, $this->buildQueryUrl());
 
         $response = curl_exec($this->connection);
         $httpCode = curl_getinfo($this->connection, CURLINFO_HTTP_CODE);
