@@ -39,12 +39,7 @@ class PDOStatement extends BasePDOStatement
         $this->baseUrl = $baseUrl;
 
         if (!empty($sqliteDsn)) {
-            $this->sqliteConnection = new BasePDO(
-                $sqliteDsn,
-                null,
-                null,
-                [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]
-            );
+            $this->sqliteConfigure($sqliteDsn);
         }
 
         if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
@@ -63,6 +58,27 @@ class PDOStatement extends BasePDOStatement
         if (isset($params['queued_writes'])) {
             $this->queuedWrites = $params['queued_writes'];
         }
+    }
+
+    private function sqliteConfigure(string $sqliteDsn): void
+    {
+        $this->sqliteConnection = new BasePDO(
+            $sqliteDsn,
+            null,
+            null,
+            [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]
+        );
+
+        $stmt = $this->sqliteConnection->prepare(<<<SQL
+                        PRAGMA synchronous = NORMAL;
+                        PRAGMA mmap_size = 134217728;
+                        PRAGMA cache_size = -20000;
+                        PRAGMA foreign_keys = true;
+                        PRAGMA busy_timeout = 5000;
+                        PRAGMA temp_store = memory;
+                        SQL);
+
+        $stmt->execute();
     }
 
     public function bindValue(int|string $param, mixed $value, int $type = PDO::PARAM_STR): bool
