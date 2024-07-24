@@ -98,6 +98,8 @@ class PDO extends BasePDO implements PDOInterface
         switch ($attribute) {
             case self::RQLITE_ATTR_CONSISTENCY:
                 return $this->attributes['consistency'];
+            case PDO::ATTR_SERVER_VERSION:
+                return '3';
         }
 
         return null;
