@@ -102,9 +102,11 @@ class PDOStatement extends BasePDOStatement
                      *
                      * When this, or any other error occurs, we quietly fall back to the RQLite HTTP request method.
                      *
-                     * Failures are logged when debugging is enabled.
+                     * Other failures are logged when debugging is enabled.
                      */
-                    Log::info($e->getMessage());
+                    if ($e->getCode() !== 8) {
+                        Log::info($e->getMessage());
+                    }
                 }
             }
         }
