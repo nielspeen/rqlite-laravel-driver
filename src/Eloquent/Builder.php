@@ -22,7 +22,7 @@ class Builder extends BaseBuilder
 
     public function addFreshness(?int $seconds): static
     {
-        if($this->strictFreshness) {
+        if ($this->strictFreshness) {
             throw new RQLiteDriverException('You cannot set both freshness and strict freshness at the same time');
         }
         $this->freshness = $seconds;
@@ -31,7 +31,7 @@ class Builder extends BaseBuilder
 
     public function addStrictFreshness(?int $seconds): static
     {
-        if($this->freshness) {
+        if ($this->freshness) {
             throw new RQLiteDriverException('You cannot set both freshness and strict freshness at the same time');
         }
         $this->strictFreshness = $seconds;
@@ -69,7 +69,21 @@ class Builder extends BaseBuilder
     public function get($columns = ['*'])
     {
         return $this->runQueryWithParameters($columns, function ($columns) {
-            return parent::get($columns);
+            $maxRetries = 3;
+            $retryDelay = 100; // milliseconds
+
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    return parent::get($columns);
+                } catch (\Illuminate\Database\QueryException $e) {
+                    if ($e->getCode() == 8 && $attempt < $maxRetries) {
+                        usleep($retryDelay * 1000);
+                        $retryDelay *= 2; // Exponential backoff
+                        continue;
+                    }
+                    throw $e;
+                }
+            }
         });
     }
 
