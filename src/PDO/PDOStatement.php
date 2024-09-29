@@ -39,7 +39,11 @@ class PDOStatement extends BasePDOStatement
         $this->baseUrl = $baseUrl;
 
         if (!empty($sqliteDsn)) {
-            $this->sqliteConfigure($sqliteDsn);
+            try {
+                $this->sqliteConfigure($sqliteDsn);
+            } catch (\Exception $e) {
+                Log::error('Failed to configure SQLite (proceeding with HTTP request): ' . $e->getMessage());
+            }
         }
 
         if (Str::startsWith(Str::upper($this->sql), ['SELECT', 'PRAGMA'])) {
@@ -62,12 +66,18 @@ class PDOStatement extends BasePDOStatement
 
     private function sqliteConfigure(string $sqliteDsn): void
     {
-        $this->sqliteConnection = new BasePDO(
-            $sqliteDsn,
-            null,
-            null,
-            [BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY]
-        );
+        try {
+            $this->sqliteConnection = new BasePDO(
+                $sqliteDsn,
+                null,
+                null,
+                [
+                    BasePDO::SQLITE_ATTR_OPEN_FLAGS => BasePDO::SQLITE_OPEN_READONLY,
+                ]
+            );
+        } catch (PDOException $e) {
+            throw new RQLiteDriverException("Failed to create SQLite connection: " . $e->getMessage());
+        }
 
         $stmt = $this->sqliteConnection->prepare(<<<SQL
                         PRAGMA synchronous = NORMAL;

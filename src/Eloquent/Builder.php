@@ -69,21 +69,7 @@ class Builder extends BaseBuilder
     public function get($columns = ['*'])
     {
         return $this->runQueryWithParameters($columns, function ($columns) {
-            $maxRetries = 3;
-            $retryDelay = 100; // milliseconds
-
-            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-                try {
-                    return parent::get($columns);
-                } catch (\Illuminate\Database\QueryException $e) {
-                    if ($e->getCode() == 8 && $attempt < $maxRetries) {
-                        usleep($retryDelay * 1000);
-                        $retryDelay *= 2; // Exponential backoff
-                        continue;
-                    }
-                    throw $e;
-                }
-            }
+            return parent::get($columns);
         });
     }
 
