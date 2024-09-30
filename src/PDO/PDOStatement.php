@@ -80,7 +80,6 @@ class PDOStatement extends BasePDOStatement
         }
 
         $stmt = $this->sqliteConnection->prepare(<<<SQL
-                        PRAGMA synchronous = NORMAL;
                         PRAGMA mmap_size = 134217728;
                         PRAGMA cache_size = -20000;
                         PRAGMA foreign_keys = true;
